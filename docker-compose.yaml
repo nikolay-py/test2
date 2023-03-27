@@ -1,0 +1,17 @@
+version: "3.7"
+
+services:
+  pr_sd_xxx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        GUNICORN_TIMEOUT: $GUNICORN_TIMEOUT
+    runtime: nvidia
+    restart: always
+    container_name:  pr_sd_xxx
+    hostname: pr_sd_xxx
+    volumes:
+      - .:/app
+    ports:
+      - $APP_PORT:8000

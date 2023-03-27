@@ -1,3 +1,6 @@
+env
+.env
+artifacts/
 # Project
 **/data
 **/weights

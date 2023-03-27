@@ -1,18 +1,11 @@
-[tool.poetry]
-name = "experiments2"
-version = "0.1.0"
-description = ""
-authors = ["mset"]
-readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.8"
-sdkit = "^1.0.47"
-ipywidgets = "^8.0.4"
-pynvml = "^11.5.0"
-xformers = "^0.0.16"
-python-dotenv = "^1.0.0"
-
-[build-system]
-requires = ["poetry-core>=1.1.0"]
-build-backend = "poetry.core.masonry.api"
+sdkit==1.0.47
+ipywidgets==8.0.4
+pynvml==11.5.0
+xformers==0.0.16
+python-dotenv==1.0.0
+Flask==2.0.2
+jsonschema==4.17.3
+Pillow==9.4.0
+gunicorn==20.1.0
+urllib3>=1.26.5
+chardet>=4.0.0

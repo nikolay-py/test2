@@ -4,6 +4,7 @@
 https://disk.yandex.ru/d/T1016-ApKcAWJA
 и распаковать архив в рабочую директорию проекта.
 
+wget -O new_filename.zip https://example.com/old_filename.zip
 ------------------------------------------------
 
 Предварительно сделано 2 скрипта:

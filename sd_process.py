@@ -7,23 +7,22 @@ from io import BytesIO
 import io
 import sys
 
-from dotenv import load_dotenv
 import sdkit
 from sdkit.models import download_model, load_model
 from sdkit.generate import generate_images
 from sdkit.filter import apply_filters
 from sdkit.utils import log
 from PIL import Image
+from config import Config
 
 #Block warnings
 warnings.filterwarnings("ignore")
 sys.stdout = None
 
 #Get env parameters
-load_dotenv()
-PATH = os.getenv("WEIGHTS_PATH")
-DEVICE = os.getenv("DEVICE")
-NSFW = os.getenv("NSFW")
+PATH = Config.WEIGHTS_PATH
+DEVICE = Config.DEVICE
+NSFW = Config.NSFW
 
 if not PATH.endswith('/'):
     PATH = PATH + '/'
@@ -43,7 +42,7 @@ load_model(context, "stable-diffusion")
 context.model_paths["gfpgan"] = PATH + "weights/GFPGANv1.4.pth"
 load_model(context, "gfpgan")
 
-context.model_paths["realesrgan"] = PATH +  "weights/RealESRGAN_x4plus.pth"
+context.model_paths["realesrgan"] = PATH + "weights/RealESRGAN_x4plus.pth"
 load_model(context, "realesrgan")
 
 def process_prompt(config):
