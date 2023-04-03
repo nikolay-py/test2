@@ -1,29 +1,27 @@
-import sdkit
-from sdkit.models import load_model
-import os
-
+import base64
 import warnings
 import os
 import random
-import json
 import base64
 from io import BytesIO
 import io
 import sys
 
 import sdkit
-from sdkit.models import download_model, load_model
+from sdkit.models import load_model
 from sdkit.generate import generate_images
 from sdkit.filter import apply_filters
 from sdkit.utils import log
 from PIL import Image
 
-
-#Block warnings
-warnings.filterwarnings("ignore")
-sys.stdout = None
-
 from config import Config
+import contextlib
+
+# # #Block warnings
+# warnings.filterwarnings("ignore")
+# sys.stdout = None
+
+
 
 #Get env parameters
 path = Config.WEIGHTS_PATH
@@ -48,43 +46,44 @@ def get_context():
     context.model_paths["realesrgan"] = os.path.join(path,'weights/RealESRGAN_x4plus.pth')
     load_model(context, "realesrgan")
 
+with contextlib.redirect_stdout(None):
+    warnings.filterwarnings("ignore")
+    context = get_context()
 
-context = get_context()
-
-def process_prompt(config, context=context):
+def process_prompt(request_data, context=context):
     """Process prompt with SD"""
     
     # Decode image if img2img
-    if config['image'] == '':
-        config['image'] = None
+    if request_data['image'] == '':
+        request_data['image'] = None
     else:
-        img = base64.b64decode(config['image'])
+        img = base64.b64decode(request_data['image'])
         buf = io.BytesIO(img)
-        config['image'] = Image.open(buf)
+        request_data['image'] = Image.open(buf)
         
     #Generate images or rescale
-    if config['scale'] > 1:
-        images = apply_filters(context, "realesrgan", config['image'], scale=config['scale'])
+    if request_data['scale'] > 1:
+        images = apply_filters(context, "realesrgan", request_data['image'], scale=request_data['scale'])
     else:
         seed = random.randint(1, 10000000)
         images = generate_images(context, 
-                                prompt=config['prompt'],
-                                negative_prompt=config['negative_prompt'],
-                                sampler_name=config['sampler'],
+                                prompt=request_data['prompt'],
+                                negative_prompt=request_data['negative_prompt'],
+                                sampler_name=request_data['sampler'],
                                 seed=seed,
-                                width=config['width'],
-                                height=config['height'],
-                                num_outputs=config['n_images'],
-                                guidance_scale=config['guidance_scale'],
-                                num_inference_steps=config['num_inference_steps'],
-                                init_image=config['image'])
+                                width=request_data['width'],
+                                height=request_data['height'],
+                                num_outputs=request_data['n_images'],
+                                guidance_scale=request_data['guidance_scale'],
+                                num_inference_steps=request_data['num_inference_steps'],
+                                init_image=request_data['image'])
     
         #If sfw - check generated inages
         if not nsfw:
             images = apply_filters(context, "nsfw_checker", images)
 
         #Make face restoration with gfpgun
-        if config['gfpgan']:
+        if request_data['gfpgan']:
             images = apply_filters(context, "gfpgan", images)
     
     #Encode results
@@ -98,4 +97,7 @@ def process_prompt(config, context=context):
         result.append({'num': i, 'pict': send_image_file})
 
     #sys.stdout = sys.__stdout__
-    return result 
+    return result
+
+if __name__ == "__main__":
+    pass

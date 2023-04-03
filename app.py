@@ -2,7 +2,13 @@ from flask import Flask, jsonify, request
 import jsonschema
 import json
 from jsonschema import validate
-from init_model import generate_images
+from init_model import process_prompt
+from config import Config
+
+import sys
+import logging
+
+
 
 # JSON Schema для запроса
 request_schema = {
@@ -29,6 +35,7 @@ request_schema = {
 
 def create_app():
     app = Flask(__name__)
+    app.config.from_object(Config)
 
     @app.route("/")
     def index():
@@ -41,7 +48,7 @@ def create_app():
             validate(request_data, request_schema)  # валидация запроса
 
             # обработка запроса
-            result = generate_images(request_data)
+            result = process_prompt(request_data)
             if result:
                 return json.dumps({"result": result}), 200
             else:
@@ -56,3 +63,10 @@ def create_app():
             return jsonify({"error": str(e)}), 500
 
     return app
+
+
+if __name__ == "__main__":
+    app = create_app()
+    app.logger.addHandler(logging.StreamHandler(sys.stdout))
+    app.logger.setLevel(logging.ERROR)
+    app.run(host='0.0.0.0', port=18001)

@@ -2,12 +2,18 @@ FROM nvidia/cuda:11.4.1-base-ubuntu20.04
 
 # Установка зависимостей
 RUN apt-get update && apt-get install -y \
-    python3-dev \
-    python3-pip \
+    python3.8-dev \
+    python3.8-distutils \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Установка libgl1-mesa-glx для работы библиотеки OpenCV (cv2)
-ENV DEBIAN_FRONTEND=noninteractive
+# Установка Python
+RUN curl https://bootstrap.pypa.io/get-pip.py | python3.8 \
+    && python3.8 -m pip install pip \
+    && python3.8 -m pip install wheel
+
+
+# Установка дополнительных зависимостей
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         software-properties-common \
@@ -17,9 +23,6 @@ RUN apt-get update && \
         libgl1-mesa-glx \
         && rm -rf /var/lib/apt/lists/*
 
-# Установка Python
-RUN pip3 install --upgrade pip
-RUN pip3 install wheel
 COPY ./requirements.txt /app/requirements.txt
 RUN pip3 install -r /app/requirements.txt
 
